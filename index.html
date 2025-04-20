@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- JW Player (self-hosted version or free licensed CDN link) -->
+  <script src="https://cdn.jwplayer.com/libraries/DV3FtaT5.js"></script>
+  <style>
+    #videoPlayer { aspect-ratio: 16 / 9; width: 100%; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-2xl space-y-4">
+    <h1 class="text-2xl font-bold text-center text-blue-400">Dropbox Direct Download & File Stream</h1>
+
+    <input id="dropboxUrl" type="text"
+      placeholder="Paste Dropbox share link..."
+      class="w-full p-3 rounded-xl bg-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-blue-500"/>
+
+    <button onclick="generateLink()"
+      class="w-full bg-blue-600 hover:bg-blue-700 font-semibold py-2 rounded-xl">
+      Generate Direct Link
+    </button>
+
+    <div id="resultBox" class="hidden space-y-3">
+      <div>
+        <label class="text-sm text-gray-300">Direct Link:</label>
+        <input id="directLink" type="text" readonly
+          class="w-full p-3 rounded-xl bg-gray-700 text-white mb-1"/>
+        <button onclick="copyLink()"
+          class="w-full bg-green-600 hover:bg-green-700 font-semibold py-2 rounded-xl">
+          Copy to Clipboard
+        </button>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="playVideo()"
+          class="flex-1 bg-purple-600 hover:bg-purple-700 py-2 rounded-xl font-semibold">
+          Stream in JW Player
+        </button>
+        <a id="downloadBtn" download
+          class="flex-1 text-center bg-yellow-500 hover:bg-yellow-600 py-2 rounded-xl font-semibold text-gray-900">
+          Download
+        </a>
+      </div>
+
+      <!-- JW Player Container -->
+      <div id="videoContainer" class="hidden">
+        <div id="videoPlayer" class="rounded-xl overflow-hidden mt-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let directLink = "";
+
+    function generateLink() {
+      const input = document.getElementById("dropboxUrl").value.trim();
+      const output = document.getElementById("directLink");
+      const resultBox = document.getElementById("resultBox");
+      const downloadBtn = document.getElementById("downloadBtn");
+
+      if (!input.includes("dropbox.com")) {
+        alert("Please enter a valid Dropbox link.");
+        return;
+      }
+
+      directLink = input
+        .replace("dl=0","?raw=1")
+        .replace("www.dropbox.com", "dl.dropboxusercontent.com");
+
+      output.value = directLink;
+      downloadBtn.href = directLink;
+      resultBox.classList.remove("hidden");
+    }
+
+    function copyLink() {
+      const output = document.getElementById("directLink");
+      output.select();
+      document.execCommand("copy");
+      alert("Copied to clipboard!");
+    }
+
+    function playVideo() {
+      if (!directLink) return;
+
+      document.getElementById("videoContainer").classList.remove("hidden");
+
+      jwplayer("videoPlayer").setup({
+        file: directLink,
+        type:"video/mp4",
+        width: "100%",
+        aspectratio: "16:9",
+        autostart: true,
+        controls: true,
+        displaytitle: false,
+        mute: false,
+        skin: { name: "glow" },
+      });
+    }
+  </script>
+</body>
+<script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>    
+</html>
